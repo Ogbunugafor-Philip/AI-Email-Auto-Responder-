@@ -213,6 +213,85 @@ Connect Node Flow:
 - True → Continue workflow.
 - False → Stop.
 
+## Step 4 – Transform Setup (Set Node)
+### Goal: Format the AI reply for personalization and add extra fields for logging.
+
+Add Set Node
+- Click ➕ Add Node → Edit Field (Set).
+  <img width="893" height="375" alt="image" src="https://github.com/user-attachments/assets/395182ed-066b-48d7-b279-a5f9d9752788" />
+
+- Change the mode from manual mapping to JSON
+- Paste the below
+```
+{
+  "reply": "{{ (() => { 
+    const content = $node['AI Response Generator'].json?.message?.content || ''; 
+    try { const parsed = JSON.parse(content); return parsed.reply || ''; } catch(e){ return content; } 
+  })() }}",
+
+  "sender": "{{$node['New Email Trigger'].json['From'] || ''}}",
+  "subject": "{{$node['New Email Trigger'].json['Subject'] || ''}}",
+  "date": "{{new Date().toLocaleString()}}",
+  "status": "Replied"
+}
+```
+#### What the JSON Script Does
+- Extracts the full text from the AI Response Generator output.
+- Tries to parse the JSON reply returned by Ollama to get only the actual response message.
+- If parsing fails, it simply returns the raw text as the reply.
+- Pulls the sender’s email address directly from the Gmail Trigger.
+- Captures the email subject from the same Gmail Trigger.
+- Adds the current date and time to show when the reply was generated.
+- Marks the message status as “Replied” for easy logging and tracking.
+
+## Step 5 – Output Setup (Send )
+### Goal: Send AI-generated email reply and log conversation details.
+
+Add Gmail Node (Send Email)
+- Click ➕ Add Node → Gmail.
+- Operation: reply to a message.
+  <img width="548" height="643" alt="image" src="https://github.com/user-attachments/assets/0e17f240-dcd3-472f-a085-186b7ea9a9d9" />
+
+ 
+
+How to Fill the Gmail “Reply to a Message” Node
+- Credential to connect with: Select your Gmail account (the same one you used for the Gmail Trigger).
+- Resource: Keep it as Message (this means you’re replying to a specific email message).
+- Operation: Select Reply — this tells Gmail to respond in the same thread instead of starting a new conversation.
+- Message ID: Use the email’s unique ID from the Gmail Trigger (click expression and paste the)
+```
+{{$node["New Email Trigger"].json["id"]}}
+```
+- Email Type: Select HTML (so your AI’s reply can include line breaks, bold text, or links in the future).
+- Message (Body): Use your AI-generated reply from the AI Assistant node: (click expression and paste the)
+```
+{{$node["AI Assistant"].json["reply"]}}
+```
+Now, every mail send to our Gmail would have a unique response based on what was sent, the power of automation
+
+#### Expected Output
+Whenever a new email arrives:
+
+i.	n8n detects it automatically.
+
+ii.	Ollama generates a professional response.
+
+iii.	The system checks if it’s reply-worthy.
+
+iv.	The AI reply is formatted and personalized.
+
+v.	Gmail sends the response
+
+## Conclusion
+The AI Email Auto-Responder marks the starting point of our journey into professional AI automation. Though simple in design, it captures the entire logic behind intelligent workflow development; Trigger, Action, Condition, Transform, and Output, the five pillars of modern automation engineering.
+By integrating n8n, Gmail API and Ollama AI, this project demonstrates how machines can communicate intelligently, reduce manual effort, and maintain structured records without writing code. It transforms a repetitive daily task into a smart, repeatable system capable of working 24/7 with speed, precision, and personalization.
+Most importantly, this project builds the mental foundation for all future automation systems. It helps you think like an engineer, identifying the event that triggers a process, defining the action that follows, introducing logic through conditions, transforming data for clarity, and delivering measurable results through well-defined outputs.
+
+
+
+
+
+
 
  
 
