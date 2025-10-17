@@ -1,3 +1,6 @@
+
+![WhatsApp Image 2025-10-17 at 04 04 44_660c09de](https://github.com/user-attachments/assets/8f25e09d-9b12-4e27-b8e4-66c8d789c607)
+
 # Introduction
 In today’s digital environment, responding to large volumes of emails can be time-consuming.
 People and businesses often struggle to reply promptly, especially when messages are repetitive or simple in nature.
